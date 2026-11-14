@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Parent workspace instructions",
+    "description": "Let nested workspaces inherit parent-workspace AGENTS.md guidance and define the parent-root marker in General settings."
+  }
+}

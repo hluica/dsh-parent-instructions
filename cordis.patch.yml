@@ -1,0 +1,5 @@
+- insert:
+    - id: dsh-parent-instructions
+      name: '@local/dsh-parent-instructions'
+      config:
+        parentRootMarker: .dsh-parent-root
