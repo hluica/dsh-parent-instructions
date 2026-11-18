@@ -32,12 +32,12 @@ proj/                         .dsh-parent-root
 
 ### 设置语义
 
-| 值 | 行为 |
-| --- | --- |
-| `.dsh-parent-root`（默认） | 在父目录链中找最近的同名文件或目录 |
-| 其他合法名 | 改用该名字；名字按文件系统规则匹配（通常区分大小写），不能含 `/`、`\`、控制字符，不能是 `.` 或 `..`，最多 128 字符 |
-| 空值 | 关闭补充（保留内置行为） |
-| 恢复默认 | 清除 profile 覆盖，回到 schema 默认值 |
+| 值                         | 行为                                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `.dsh-parent-root`（默认） | 在父目录链中找最近的同名文件或目录                                                                                 |
+| 其他合法名                 | 改用该名字；名字按文件系统规则匹配（通常区分大小写），不能含 `/`、`\`、控制字符，不能是 `.` 或 `..`，最多 128 字符 |
+| 空值                       | 关闭补充（保留内置行为）                                                                                           |
+| 恢复默认                   | 清除 profile 覆盖，回到 schema 默认值                                                                              |
 
 修改后对**下一次请求**生效，不需要重启 Host。标记本身必须放在内置项目根**之上**；放在子工作区内部不会生效，因为那一段已由内置插件负责。
 
@@ -76,16 +76,16 @@ From: /path/to/proj/AGENTS.md
 
 ## 结构
 
-| 文件 | 作用 |
-| --- | --- |
-| `index.js` | Host 半：`Config`、发现、去重、预算、缓存、`systemPrompt.context` |
-| `client.js` | Client 半：设置 → 通用的一行、`configForms` 读写、校验与状态 |
-| `cordis.patch.yml` | bundle 挂载声明（行 id `dsh-parent-instructions`） |
-| `locale/zh.json`、`locale/en.json` | 插件页显示名与描述 |
-| `icon.svg` | 插件页面图标 |
-| `test/lifecycle.test.mjs` | Client 生命周期与校验测试 |
-| `scripts/host-contract.mjs` | Host 契约探针（发现/去重/预算/注册参数） |
-| `scripts/`、`node_modules/`、`.cache/`、`deps.lock.json` | 构建系统与依赖物化产物 |
+| 文件                                                     | 作用                                                              |
+| -------------------------------------------------------- | ----------------------------------------------------------------- |
+| `index.js`                                               | Host 半：`Config`、发现、去重、预算、缓存、`systemPrompt.context` |
+| `client.js`                                              | Client 半：设置 → 通用的一行、`configForms` 读写、校验与状态      |
+| `cordis.patch.yml`                                       | bundle 挂载声明（行 id `dsh-parent-instructions`）                |
+| `locale/zh.json`、`locale/en.json`                       | 插件页显示名与描述                                                |
+| `icon.svg`                                               | 插件页面图标                                                      |
+| `test/lifecycle.test.mjs`                                | Client 生命周期与校验测试                                         |
+| `scripts/host-contract.mjs`                              | Host 契约探针（发现/去重/预算/注册参数）                          |
+| `scripts/`、`node_modules/`、`.cache/`、`deps.lock.json` | 构建系统与依赖物化产物                                            |
 
 ---
 
@@ -93,13 +93,13 @@ From: /path/to/proj/AGENTS.md
 
 Host 半 `import z from '@deepseek-ai/schemastery'`，而 profile 不提供这个包，所以插件自带一份真实文件（不是符号连接）。`node_modules/` 是**产物**，由 `npm run build` 从 `deps.lock.json` 生成。
 
-| 命令 | 作用 |
-| --- | --- |
-| `npm run build` | 物化依赖，然后自动跑 `verify` |
-| `npm run verify` | 布局/依赖/清单/解析 + Client 测试 + Host 契约探针 |
-| `npm run rebuild` | 即 `build --force` |
-| `npm run clean` | 删除 `node_modules/` 与 `.cache/` |
-| `npm test` | 只跑 Client 生命周期测试 |
+| 命令              | 作用                                              |
+| ----------------- | ------------------------------------------------- |
+| `npm run build`   | 物化依赖，然后自动跑 `verify`                     |
+| `npm run verify`  | 布局/依赖/清单/解析 + Client 测试 + Host 契约探针 |
+| `npm run rebuild` | 即 `build --force`                                |
+| `npm run clean`   | 删除 `node_modules/` 与 `.cache/`                 |
+| `npm test`        | 只跑 Client 生命周期测试                          |
 
 构建系统来自工作区参考副本 `build-system/`。`scripts/build.mjs`、`scripts/verify.mjs`、`scripts/lib/*` 与参考副本逐字节一致；`scripts/host-contract.mjs` 是本插件自己的文件，不随同步覆盖。修改构建系统时应改参考副本并运行 `node build-system/sync.mjs`，不要直接改这里。
 
@@ -173,3 +173,9 @@ plugin_manager: action=install_bundle, target=<local-plugins/dsh-parent-instruct
 ## 运行期版本契约
 
 `peerDependencies` 声明 `@deepseek-ai/dsh: ^0.2.2-rc.3`。DSH 的版本闸门使用 `semver.satisfies(runtime, range, { includePrerelease: true })`；不满足时会跳过该 bundle。未来大版本变化时按插件页提示处理版本豁免。
+
+---
+
+## 许可证
+
+MIT License，详见 [LICENSE](./LICENSE)。
