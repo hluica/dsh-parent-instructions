@@ -180,6 +180,9 @@ function renderRow() {
 
 const tree = renderRow()
 check('row root is an entry container', tree?.type === 'div' && tree?.props?.className === 'dpi-entry', JSON.stringify(tree?.type))
+check('title and controls share the first line', tree?.props?.children?.[0]?.props?.className === 'dpi-head', JSON.stringify(tree?.props?.children?.[0]?.props?.className))
+check('description owns a full-width line', tree?.props?.children?.[1]?.props?.className === 'dpi-desc', JSON.stringify(tree?.props?.children?.[1]?.props?.className))
+check('status owns a full-width line', typeof tree?.props?.children?.[2]?.props?.className === 'string' && tree.props.children[2].props.className.startsWith('dpi-status'), JSON.stringify(tree?.props?.children?.[2]?.props?.className))
 
 function walk(node, visit) {
   if (node === null || node === undefined) return
@@ -240,6 +243,17 @@ check(
   writes.some(write => write[0] === 'unset' && write[1] === 'parentRootMarker'),
   JSON.stringify(writes),
 )
+
+inputs[0].props.onChange({ target: { value: 'bad/name' } })
+const invalid = renderRow()
+const invalidInputs = []
+const invalidTexts = []
+walk(invalid, (node) => {
+  if (node.type === 'input') invalidInputs.push(node)
+  if (node.type === 'div' && typeof node.props?.children === 'string') invalidTexts.push(node.props.children)
+})
+check('invalid draft marks the input', invalidInputs[0]?.props?.['aria-invalid'] === true, JSON.stringify(invalidInputs[0]?.props?.['aria-invalid']))
+check('invalid draft explains the problem', invalidTexts.some(text => text.includes('路径分隔符')), JSON.stringify(invalidTexts))
 
 const { normalizeMarker, readSaved } = plugin.__test
 check('empty marker is valid and disables', JSON.stringify(normalizeMarker('')) === JSON.stringify({ ok: true, value: '', error: undefined }))

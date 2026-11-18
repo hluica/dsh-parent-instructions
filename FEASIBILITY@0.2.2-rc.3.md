@@ -148,6 +148,18 @@ get(session: Session): string
 - Host 半在 `apply` 中通过 `ctx.inject(['settings'], child => child.effect(() => child.settings.configure({ auto: false }, ctx.fiber)))` 声明“自带页面、不要自动生成表单”；`dsh-custom-css` 是直接先例。
 - `settings` 服务负责持久化到当前 profile 的 patch；写入被更高层覆盖时返回失败，UI 必须显示失败而不是假装保存成功。
 
+#### 2026-11-15：设置行改为“标题控件一行、描述整行”
+
+- **目的**：修掉设置行的失衡外观。通用设置的内容栏在宽视口下为 564 CSS px；旧实现把标题、描述、状态放在左列，输入框（220px）与两个按钮放在右列。右列固有宽度约 370px，左列只剩约 150px，60 余字的中文描述被折成 7 行，行高约 190px，纵向分栏位置明显偏向右侧。
+- **修法**：`.dpi-entry` 改为纵向三行：
+  1. `.dpi-head`：标题（`flex:1 1 140px`）与 `.dpi-control`（输入框 200px + 保存 + 恢复默认，右对齐、允许换行）；
+  2. `.dpi-desc`：描述独占整行；
+  3. `.dpi-status`：状态独占整行，继续保留 `aria-live="polite"` 与 `aria-describedby`。
+  `.dpi-entry` 设为 `container-type:inline-size`，用 `@container (max-width:540px)` 切换为纵向：标题在上、控件行在下，输入框 `flex:1 1 160px` 且 `min-width:120px` 自适应扩展；按钮 `flex:0 0 auto` 且 `white-space:nowrap`，不足宽度时整组换行而不是压缩文字。用容器宽度而非视口宽度判断，是因为通用设置内容栏在宽视口下固定为 564px，窗口变窄时随面板收缩；浏览器布局在 <768px 还会切换为全屏，单一视口断点无法同时对准这些形态（macOS Desktop 保留侧栏，仅面板随视口收缩）。
+- **依据**：`ui-settings-general` README 记载设置面板为 800×800 且内容栏由视口约束；其布局 CSS 为 `grid` 的 `188px minmax(0,1fr)` 加 24px 内容内边距，实际内容栏 564px。用户截图按 2× 比例换算，左列约 150px、行高约 190px。改后描述在 564px 宽下约 2 行，按同宽估算行高约 130px。
+- **验证**：`npm test` 新增三行结构断言（标题+控件、描述、状态各占一层）与非法草稿的 `aria-invalid`/错误文案断言，全部通过；`npm run verify` 全部通过。另按 UI/UX 复查意见补了 `--dsw-focus-ring-color` 的 `--dsw-alias-state-business-primary` 回退（上游 `focus.css` 同款）、按钮 `box-sizing:border-box`、输入框 `aria-invalid`。真实浏览器截图/明暗主题并排对比仍需用户刷新页面后确认。
+- **版本**：仅视觉排版调整，设置 id、order、读写路径、校验与状态机均未变化；按本工作区“外观修正也提升版本号”的惯例，插件版本由 `0.1.0` 提升为 `0.1.1`。README 的用法与设置语义无需变更。
+
 ### 3.5 Host Config 与 `.volatile()`
 
 本插件 Host `Config` 计划为：
@@ -346,7 +358,7 @@ Client 半（client.js）
 | Config 字段 | `parentRootMarker`（volatile，默认 `.dsh-parent-root`） |
 | Host context 名 | `parent-workspace-instructions` |
 | context order | `250` |
-| 插件版本 | `0.1.0`（首版） |
+| 插件版本 | `0.1.1`（首版 `0.1.0`；2026-11-15 设置行外观修正） |
 | peer | `@deepseek-ai/dsh: ^0.2.2-rc.3` |
 
 ---

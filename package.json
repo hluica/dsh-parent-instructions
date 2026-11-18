@@ -1,6 +1,6 @@
 {
   "name": "@local/dsh-parent-instructions",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Add parent-workspace AGENTS.md guidance to nested workspaces and define the parent-root marker in Settings.",

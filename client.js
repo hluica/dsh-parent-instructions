@@ -30,25 +30,29 @@ window.__ModuleLoader__.load({
     const MAX_MARKER_LENGTH = 128
 
     const CSS = `
-      .dpi-entry{border-bottom:.5px solid var(--dsw-alias-border-l2);padding:16px 0}
-      .dpi-row{display:flex;align-items:flex-start;gap:16px}
-      .dpi-rowText{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding-right:24px}
-      .dpi-title{color:var(--dsw-alias-label-primary);font-size:14px;font-weight:400;line-height:22px}
-      .dpi-desc{color:var(--dsw-alias-label-tertiary);font-size:12px;font-weight:400;line-height:18px}
-      .dpi-control{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end}
-      .dpi-input{box-sizing:border-box;width:220px;height:32px;padding:0 10px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px;line-height:20px}
+      .dpi-entry{border-bottom:.5px solid var(--dsw-alias-border-l2);padding:16px 0;display:flex;flex-direction:column;gap:6px;container-type:inline-size}
+      .dpi-head{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
+      .dpi-title{flex:1 1 140px;min-width:0;color:var(--dsw-alias-label-primary);font-size:14px;font-weight:400;line-height:22px}
+      .dpi-desc{color:var(--dsw-alias-label-tertiary);font-size:12px;font-weight:400;line-height:18px;max-width:100%}
+      .dpi-control{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+      .dpi-input{box-sizing:border-box;width:200px;min-width:0;max-width:100%;height:32px;padding:0 10px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px;line-height:20px}
       .dpi-input:focus{outline:none;border-color:var(--dsw-alias-brand-primary)}
       .dpi-input:disabled{opacity:.6;cursor:default}
-      .dpi-button{height:32px;padding:0 14px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l1);background:transparent;color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:13px;line-height:20px;cursor:pointer}
+      .dpi-button{box-sizing:border-box;flex:0 0 auto;height:32px;padding:0 14px;border-radius:var(--dsw-radius-sm);border:.5px solid var(--dsw-alias-border-l1);background:transparent;color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:13px;line-height:20px;white-space:nowrap;cursor:pointer}
       .dpi-button:hover:not(:disabled){background:var(--dsw-alias-bg-layer-2)}
       .dpi-button:disabled{opacity:.5;cursor:default}
-      .dpi-button:focus-visible{outline:var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color);outline-offset:2px}
+      .dpi-button:focus-visible{outline:var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary));outline-offset:2px}
       .dpi-buttonPrimary{border-color:transparent;background:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground)}
       .dpi-buttonPrimary:hover:not(:disabled){background:var(--dsw-alias-button-primary-hover)}
       .dpi-status{font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)}
       .dpi-statusDirty{color:var(--dsw-alias-brand-primary)}
       .dpi-statusError{color:var(--dsw-alias-state-error-primary)}
-      @media (max-width:720px){.dpi-row{flex-direction:column}.dpi-rowText{padding-right:0}.dpi-control{width:100%;justify-content:flex-start}}
+      @container (max-width:540px){
+        .dpi-head{flex-direction:column;align-items:stretch;gap:8px}
+        .dpi-title{flex:0 0 auto}
+        .dpi-control{margin-left:0;justify-content:flex-start}
+        .dpi-input{flex:1 1 160px;width:auto;min-width:120px}
+      }
     `
 
     const zh = {
@@ -210,14 +214,8 @@ window.__ModuleLoader__.load({
           { className: 'dpi-entry' },
           h(
             'div',
-            { className: 'dpi-row' },
-            h(
-              'div',
-              { className: 'dpi-rowText' },
-              h('div', { className: 'dpi-title' }, t('row.title')),
-              h('div', { className: 'dpi-desc', id: 'dpi-parent-marker-desc' }, t('row.description')),
-              h('div', { className: status.className, id: 'dpi-parent-marker-status', 'aria-live': 'polite' }, status.text),
-            ),
+            { className: 'dpi-head' },
+            h('div', { className: 'dpi-title' }, t('row.title')),
             h(
               'div',
               { className: 'dpi-control' },
@@ -229,6 +227,7 @@ window.__ModuleLoader__.load({
                 maxLength: 256,
                 disabled: busy,
                 'aria-label': t('field.label'),
+                'aria-invalid': verdict.ok ? undefined : true,
                 'aria-describedby': 'dpi-parent-marker-desc dpi-parent-marker-status',
                 onChange: event => setDraft(event.target.value),
                 onKeyDown: (event) => {
@@ -260,6 +259,8 @@ window.__ModuleLoader__.load({
               ),
             ),
           ),
+          h('div', { className: 'dpi-desc', id: 'dpi-parent-marker-desc' }, t('row.description')),
+          h('div', { className: status.className, id: 'dpi-parent-marker-status', 'aria-live': 'polite' }, status.text),
         )
       }
     }
